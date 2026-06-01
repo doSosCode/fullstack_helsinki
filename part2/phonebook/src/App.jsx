@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
+//import axios from 'axios';
+import personService from './services/personService';
 
 const Filter = (props) => {
   return (
@@ -27,23 +29,31 @@ const PersonForm = (props) => {
 const Persons = (props) => {
   return (
     <div>
-      {props.filterPhonebook.map(person =>
-        <li key={person.id}>{person.name} {person.number}</li>
+      {props.filterPhonebook.map(filteredPerson =>
+        <li key={filteredPerson.id}>
+          {filteredPerson.name} {filteredPerson.number} <button onClick={() => props.deletePerson(filteredPerson.id)}>delete</button>
+        </li>
       )}
     </div>
   )
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+
+  useEffect(() => {
+    console.log('effect')
+    personService
+      .getAll()
+      .then(initialPersons => {
+        console.log('promise fulfilled')
+        setPersons(initialPersons)
+      })
+  }, [])
+  console.log('render', persons.length, 'persons')
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -51,24 +61,48 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: String(persons.length + 1)
     }
     if (persons.map(person => person.name).includes(newName)) {
-      window.alert(`${personObject.name} is already added to phonebook`);
+      const changedPerson = {...personObject, number: newNumber}
+      const personID = persons.find(person => person.name === newName).id
+      if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(personID, changedPerson)
+          .then(changedPerson => {
+          setPersons(currentPersons => currentPersons.map(person => person.name === changedPerson.name ? changedPerson : person))
+          setNewName('')
+          setNewNumber('')
+          })
+      }
     }
     else if (persons.map(person => person.number).includes(newNumber)) {
-      window.alert(`${personObject.number} is already allocated to someone else`);
+      window.alert(`${personObject.number} is already allocated to some other person`);
     }
-    else {
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
+    else {    
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
-
+  
+  const deletePerson = (id) => {
+    if(window.confirm('Are you sure you want to delete this entry?')) {
+      personService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(returnedPersons => returnedPersons.filter(person => person.id !== id))
+        })
+    }
+  }
+  
   const filterPhonebook = newFilter
-  ? persons.filter(person => person.name.match(new RegExp(newFilter, "gi")))
+  ? persons.filter(filteredPerson => filteredPerson.name.match(new RegExp(newFilter, "gi")))
   : persons
+
 
   const handleNameChange = (event) => {
     //console.log(event.target.value)
@@ -93,7 +127,7 @@ const App = () => {
       <h2>add a new</h2>
       <PersonForm addPerson={addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
-      <Persons filterPhonebook={filterPhonebook}/>
+      <Persons filterPhonebook={filterPhonebook} deletePerson={deletePerson} />
     </div>
   )
 }
