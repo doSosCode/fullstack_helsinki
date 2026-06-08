@@ -35,7 +35,11 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  if (response.json(persons)) {
+    response.json(persons)
+  } else {
+    response.status(404).end()
+  }
 })
 
 app.get('/info', (request, response) => {
