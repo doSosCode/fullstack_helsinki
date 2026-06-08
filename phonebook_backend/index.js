@@ -9,7 +9,7 @@ morgan.token('content-data', function getData (res) {
 app.use(express.json())
 app.use(morgan(':method :url :status :response-time ms :content-data'))
 app.use(cors())
-app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static('dist'))
 
 let persons = [
     { 
