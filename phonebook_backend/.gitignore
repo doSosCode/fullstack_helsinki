@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 *.local
+.env
+
+phonebook_db.txt
 
 # Editor directories and files
 .vscode/*
