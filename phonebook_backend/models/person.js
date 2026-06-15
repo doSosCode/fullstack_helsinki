@@ -1,7 +1,6 @@
-import pkg from 'mongoose';
-const { set, connect, Schema, model, connection } = pkg;
+const mongoose = require('mongoose');
 
-import dns from 'dns';
+const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 /*
