@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+import pkg from 'mongoose';
+const { set, connect, Schema, model, connection } = pkg;
 
 /*
 if (process.argv.length < 3) {
@@ -14,6 +15,12 @@ mongoose.set('strictQuery',false)
 const url = process.argv.MONGODB_URI
 
 mongoose.connect(url, { family: 4 })
+  .then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch(error => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
 
 const personSchema = new mongoose.Schema({
   name: String,
