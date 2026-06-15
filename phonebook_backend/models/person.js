@@ -1,6 +1,9 @@
 import pkg from 'mongoose';
 const { set, connect, Schema, model, connection } = pkg;
 
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 /*
 if (process.argv.length < 3) {
   console.log('give password as argument')
