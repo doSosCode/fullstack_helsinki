@@ -14,7 +14,7 @@ const password = process.argv[2]
 
 mongoose.set('strictQuery',false)
 
-const url = process.argv.MONGODB_URI
+const url = process.env.MONGODB_URI
 
 mongoose.connect(url, { family: 4 })
   .then(result => {
