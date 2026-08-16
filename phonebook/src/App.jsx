@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-//import axios from 'axios';
 import personService from './services/personService';
 import './index.css'
 
@@ -107,6 +106,27 @@ const App = () => {
           }, 5000)
           })
       }
+      else {    
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+          setNotificationMessage(
+            `Added ${personObject.name}`
+          )
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(`${error.response.data.error}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+      }
     }
     else if (persons.map(person => person.number).includes(newNumber)) {
       window.alert(`${personObject.number} is already allocated to some other person`);
@@ -126,13 +146,10 @@ const App = () => {
           }, 5000)
         })
         .catch(error => {
-          setErrorMessage(
-            `${error.response.data.error}`
-          )
+          setErrorMessage(`${error.response.data.error}`)
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
-          console.log(error.response.data.error)
         })
     }
   }
