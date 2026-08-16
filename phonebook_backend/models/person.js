@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+const dns = require('dns')
+dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 mongoose.set('strictQuery',false)
 
@@ -9,7 +9,7 @@ const url = process.env.MONGODB_URI
 
 mongoose.connect(url, { family: 4 })
   .then(result => {
-    console.log('connected to MongoDB')
+    console.log('connected to MongoDB', `(${result.message})`)
   })
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
@@ -19,7 +19,13 @@ const personSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: [3, 'Name must be longer than 2 characters'],
-    required: [true, 'Please type in a name']
+    required: [true, 'Please type in a name'],
+    validate: {
+      validator: function(v) {
+        return /^[\p{L}']+([- ][\p{L}']+)*$/u.test(v)
+      },
+      message: 'Name must start and end with letters and can contain special characters - and \' only'
+    }
   },
   number: {
     type: String,
@@ -27,9 +33,9 @@ const personSchema = new mongoose.Schema({
     required: [true, 'Please type in a number'],
     validate: {
       validator: function(v) {
-        return /^\d{2}-\d{6,}$|^\d{3}-\d{5,}$/.test(v);
+        return /^\d{2}-\d{6,}$|^\d{3}-\d{5,}$/.test(v)
       },
-      message: `Number must be in format 12-345678[...] or 123-45678[...]`
+      message: 'Number must be in format 12-345678[...] or 123-45678[...]'
     }
   }
 })

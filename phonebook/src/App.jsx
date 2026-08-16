@@ -168,15 +168,6 @@ const App = () => {
             setNotificationMessage(null)
           }, 5000)
         })
-        .catch(error => {
-          setErrorMessage(
-            `Information of ${personToDelete.name} was already removed from server`
-          )
-          setTimeout(() => {
-            setErrorMessage(null)
-          }, 5000)
-          setPersons(persons.filter(person => person.id !== id))
-        })
     }
   }
   
